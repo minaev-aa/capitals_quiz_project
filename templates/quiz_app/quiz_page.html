@@ -1,0 +1,65 @@
+{% extends 'quiz_app/base.html' %}
+{% load static %}
+
+{% block title %}Викторина{% endblock %}
+
+{% block content %}
+<h2>Викторина: Угадай Столицу</h2>
+
+{% if error %}
+    <p class="message-error">{{ error }}</p>
+{% elif game_over %}
+    <p class="flash-message message-success">{{ message }}</p>
+    <p>Имя: <strong>{{ player_name }}</strong></p>
+    <p>Итоговый счет: <strong>{{ total_score }}</strong></p>
+    <p><a href="{% url 'quiz_page' %}">Начать новую игру</a></p>
+    <p><a href="{% url 'leaders_page' %}">Посмотреть таблицу лидеров</a></p>
+{% else %}
+
+    {# Show messages if they exist in context #}
+    {% if message %}
+        <p class="flash-message {% if is_correct %}message-success{% else %}message-error{% endif %}">{{ message }}</p>
+    {% endif %}
+
+    {# Show error message if name was invalid #}
+    {% if error_message %}
+        <p class="flash-message message-error">{{ error_message }}</p>
+    {% endif %}
+
+    <p>Игрок: <strong>{{ request.session.player_name|default:"Не указано" }}</strong></p>
+    <p>Текущий счет (непрерывных правильных ответов): <strong>{{ current_score }}</strong></p>
+    <p>Вопрос {{ shown_count }} из {{ total_countries }}</p>
+
+    <p>Какая столица у страны:</p>
+    <h3>{{ country }}</h3>
+
+    {% if image_path %}
+        <img src="{% static image_path %}" alt="Изображение {{ country }}" class="quiz-image">
+    {% else %}
+        <p>[Нет иллюстрации]</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'process_quiz' %}">
+        {% csrf_token %}
+
+        {# Always show the name input field if name is not set in session #}
+        {% if request.session.player_name == None %}
+             <div class="form-group">
+                <label for="player_name">Ваше имя (для рекордов):</label>
+                <input type="text" id="player_name" name="player_name" placeholder="Введите имя" required>
+             </div>
+        {% else %}
+             {# Pass name via hidden field if already set #}
+             <input type="hidden" name="player_name" value="{{ request.session.player_name }}">
+        {% endif %}
+
+
+        <div class="form-group">
+            <label for="capital_guess">Столица:</label>
+            <input type="text" id="capital_guess" name="capital_guess" placeholder="Введите столицу" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Проверить</button>
+    </form>
+{% endif %}
+{% endblock %}

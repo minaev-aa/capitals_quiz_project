@@ -1,0 +1,28 @@
+{% extends 'quiz_app/base.html' %}
+
+{% block title %}Лидеры Викторины{% endblock %}
+
+{% block content %}
+<h2>Таблица Лидеров</h2>
+
+{% if leaders %}
+    <table class="leaderboard">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Рекорд (непрерывных правильных ответов)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leader in leaders %}
+                <tr>
+                    <td>{{ leader.name }}</td>
+                    <td>{{ leader.score }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Нет записей в таблице лидеров. Начните играть!</p>
+{% endif %}
+{% endblock %}
